@@ -272,20 +272,12 @@ const submitAndPay = async () => {
             throw new Error('需求提交失败：未返回 requirement_id')
         }
 
-        // 2) 发起支付，param 透传 requirement_id 等信息
-        const paramObj = {
-            requirement_id: requirementId,
-            contact: form.value.contact,
-            type: form.value.type,
-            detail: form.value.detail,
-            from: 'product',
-        }
-
+        // 2) 发起支付：param 只透传 requirement_id（纯值）
         const res = await payTest({
             money: 1,
             type: 'wxpay',
             name: '排期费(1元)',
-            param: JSON.stringify(paramObj),
+            param: String(requirementId),
         })
 
         closePayDialog()

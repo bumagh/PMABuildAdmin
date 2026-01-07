@@ -59,6 +59,7 @@ class Payworld extends Frontend
             'return_url'  => $returnUrl,
             'name'        => $name,
             'money'       => $money,
+            // param 只传 requirement_id（字符串/数字），不再传 JSON
             'param'       => $param,
             'timestamp'   => $timestamp,
         ];
@@ -139,7 +140,10 @@ class Payworld extends Frontend
 
             $paramStr = (string)($rawGet['param'] ?? '');
             $requirementId = $this->extractRequirementId($paramStr);
-            Log::info('[payworld.notify] requirement', ['requirement_id' => $requirementId, 'param' => $paramStr]);
+            Log::info('[payworld.notify] requirement', [
+                'requirement_id' => $requirementId,
+                'param_raw' => $paramStr,
+            ]);
 
             if ($requirementId > 0) {
                 // 更新支付状态
@@ -218,7 +222,10 @@ class Payworld extends Frontend
 
         $paramStr = (string)($rawGet['param'] ?? '');
         $requirementId = $this->extractRequirementId($paramStr);
-        Log::info('[payworld.return] requirement', ['requirement_id' => $requirementId, 'param' => $paramStr]);
+        Log::info('[payworld.return] requirement', [
+            'requirement_id' => $requirementId,
+            'param_raw' => $paramStr,
+        ]);
 
         if ($requirementId <= 0) {
             $this->success('支付成功');
@@ -242,16 +249,14 @@ class Payworld extends Frontend
             return 0;
         }
 
-        $data = json_decode($paramStr, true);
-        if (json_last_error() === JSON_ERROR_NONE && is_array($data)) {
-            $id = (int)($data['requirement_id'] ?? 0);
-            return $id > 0 ? $id : 0;
-        }
+        // param 约定为纯 requirement_id（数字或数字字符串），兼容 urlencoded
+        $decoded = urldecode($paramStr);
+        $decoded = trim($decoded);
 
-        // 兼容 param 不是 JSON 的情况：尝试从 querystring 提取
-        parse_str($paramStr, $arr);
-        $id = (int)($arr['requirement_id'] ?? 0);
-        return $id > 0 ? $id : 0;
+        // 去掉可能出现的引号
+        $decoded = trim($decoded, "\"' ");
+
+        return ctype_digit($decoded) ? (int)$decoded : 0;
     }
 
     private function buildSignContent(array $params): string
