@@ -9,6 +9,16 @@
                         <div class="main-content">
                             {{ $t('index.Steve Jobs') }}
                         </div>
+
+                        <el-button
+                            @click="$router.push('/product')"
+                            class="container-button"
+                            color="#ffffff"
+                            size="large"
+                        >
+                            产品介绍
+                        </el-button>
+
                         <el-button
                             v-if="memberCenter.state.open"
                             @click="$router.push(memberCenterBaseRoutePath)"

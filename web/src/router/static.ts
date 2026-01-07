@@ -21,6 +21,15 @@ const staticRoutes: Array<RouteRecordRaw> = [
         },
     },
     {
+        // 产品页
+        path: '/product',
+        name: 'product',
+        component: () => import('/@/views/frontend/product.vue'),
+        meta: {
+            title: pageTitle('product'),
+        },
+    },
+    {
         // 管理员登录页 - 不放在 adminBaseRoute.children 因为登录页不需要使用后台的布局
         path: adminBaseRoutePath + '/login',
         name: 'adminLogin',
