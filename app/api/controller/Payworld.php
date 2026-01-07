@@ -5,6 +5,7 @@ namespace app\api\controller;
 use app\admin\model\requirement\Forms;
 use app\common\controller\Frontend;
 use Throwable;
+use think\facade\Log;
 
 class Payworld extends Frontend
 {
@@ -31,8 +32,9 @@ class Payworld extends Frontend
 
         $outTradeNo = 'PW' . date('YmdHis') . random_int(100, 999);
 
-        $notifyUrl = $this->request->domain() . '/api/payworld/notify';
-        $returnUrl = $this->request->domain() . '/api/payworld/return';
+        // 本地调试环境可能需要 index.php 入口
+        $notifyUrl = $this->request->domain() . '/index.php/api/payworld/notify';
+        $returnUrl = $this->request->domain() . '/index.php/api/payworld/return';
 
         $configFile = root_path() . 'app/api/controller/paysdk/lib/epay.config.php';
         if (!is_file($configFile)) {
@@ -76,9 +78,18 @@ class Payworld extends Frontend
 
     public function notify(): void
     {
+        // 使用原始 $_GET 避免框架对参数的过滤/转换影响验签（尤其是 sign/+/
+        $rawGet = $_GET ?? [];
+
+        Log::info('[payworld.notify] incoming', [
+            'get' => $rawGet,
+            'ip' => $this->request->ip(),
+        ]);
+
         // 彩虹易支付异步通知：必须输出 success 才代表处理成功
         $configFile = root_path() . 'app/api/controller/paysdk/lib/epay.config.php';
         if (!is_file($configFile)) {
+            Log::error('[payworld.notify] missing config', ['configFile' => $configFile]);
             echo 'fail';
             return;
         }
@@ -87,6 +98,7 @@ class Payworld extends Frontend
 
         $sdkFile = root_path() . 'app/api/controller/paysdk/lib/EpayCore.class.php';
         if (!is_file($sdkFile)) {
+            Log::error('[payworld.notify] missing sdk', ['sdkFile' => $sdkFile]);
             echo 'fail';
             return;
         }
@@ -94,36 +106,74 @@ class Payworld extends Frontend
 
         try {
             $epay = new \EpayCore($epay_config);
-            $verify = $epay->verify($this->request->get());
+            $verify = $epay->verify($rawGet);
+            Log::info('[payworld.notify] verify', [
+                'ok' => $verify ? 1 : 0,
+                'sign' => $rawGet['sign'] ?? null,
+                'sign_type' => $rawGet['sign_type'] ?? null,
+                'timestamp' => $rawGet['timestamp'] ?? null,
+            ]);
             if (!$verify) {
                 echo 'fail';
                 return;
             }
 
-            $tradeStatus = (string)$this->request->get('trade_status', '');
+            $tradeStatus = (string)($rawGet['trade_status'] ?? '');
+            $outTradeNo = (string)($rawGet['out_trade_no'] ?? '');
+            $tradeNo = (string)($rawGet['trade_no'] ?? '');
+            $money = (string)($rawGet['money'] ?? '');
+            $payType = (string)($rawGet['type'] ?? '');
+
+            Log::info('[payworld.notify] verified payload', [
+                'trade_status' => $tradeStatus,
+                'out_trade_no' => $outTradeNo,
+                'trade_no' => $tradeNo,
+                'money' => $money,
+                'type' => $payType,
+            ]);
+
             if ($tradeStatus !== 'TRADE_SUCCESS') {
                 echo 'success';
                 return;
             }
 
-            $paramStr = (string)$this->request->get('param', '');
+            $paramStr = (string)($rawGet['param'] ?? '');
             $requirementId = $this->extractRequirementId($paramStr);
+            Log::info('[payworld.notify] requirement', ['requirement_id' => $requirementId, 'param' => $paramStr]);
+
             if ($requirementId > 0) {
                 // 更新支付状态
-                Forms::where('id', $requirementId)->update(['pay_status' => 1]);
+                $rows = Forms::where('id', $requirementId)->update(['pay_status' => 1]);
+                Log::info('[payworld.notify] updated pay_status', ['requirement_id' => $requirementId, 'rows' => $rows]);
+            } else {
+                Log::warning('[payworld.notify] requirement_id missing', ['param' => $paramStr]);
             }
 
             echo 'success';
         } catch (Throwable $e) {
+            Log::error('[payworld.notify] exception', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
             echo 'fail';
         }
     }
 
     public function return(): void
     {
+        // 使用原始 $_GET 避免框架对参数的过滤/转换影响验签
+        $rawGet = $_GET ?? [];
+
+        Log::info('[payworld.return] incoming', [
+            'get' => $rawGet,
+            'ip' => $this->request->ip(),
+        ]);
+
         // 同步回调：用于前端展示结果（仍需验签）
         $configFile = root_path() . 'app/api/controller/paysdk/lib/epay.config.php';
         if (!is_file($configFile)) {
+            Log::error('[payworld.return] missing config', ['configFile' => $configFile]);
             $this->error('支付配置缺失');
         }
         $epay_config = [];
@@ -131,31 +181,56 @@ class Payworld extends Frontend
 
         $sdkFile = root_path() . 'app/api/controller/paysdk/lib/EpayCore.class.php';
         if (!is_file($sdkFile)) {
+            Log::error('[payworld.return] missing sdk', ['sdkFile' => $sdkFile]);
             $this->error('支付SDK缺失');
         }
         require_once $sdkFile;
 
         $epay = new \EpayCore($epay_config);
-        if (!$epay->verify($this->request->get())) {
+        $verify = $epay->verify($rawGet);
+        Log::info('[payworld.return] verify', [
+            'ok' => $verify ? 1 : 0,
+            'sign' => $rawGet['sign'] ?? null,
+            'sign_type' => $rawGet['sign_type'] ?? null,
+            'timestamp' => $rawGet['timestamp'] ?? null,
+        ]);
+        if (!$verify) {
+            Log::warning('[payworld.return] verify failed payload', $rawGet);
             $this->error('验签失败');
         }
 
-        $tradeStatus = (string)$this->request->get('trade_status', '');
+        $tradeStatus = (string)($rawGet['trade_status'] ?? '');
+        $outTradeNo = (string)($rawGet['out_trade_no'] ?? '');
+        $tradeNo = (string)($rawGet['trade_no'] ?? '');
+        $money = (string)($rawGet['money'] ?? '');
+        $payType = (string)($rawGet['type'] ?? '');
+        Log::info('[payworld.return] verified payload', [
+            'trade_status' => $tradeStatus,
+            'out_trade_no' => $outTradeNo,
+            'trade_no' => $tradeNo,
+            'money' => $money,
+            'type' => $payType,
+        ]);
+
         if ($tradeStatus !== 'TRADE_SUCCESS') {
             $this->error('支付未成功：' . $tradeStatus);
         }
 
-        $paramStr = (string)$this->request->get('param', '');
+        $paramStr = (string)($rawGet['param'] ?? '');
         $requirementId = $this->extractRequirementId($paramStr);
+        Log::info('[payworld.return] requirement', ['requirement_id' => $requirementId, 'param' => $paramStr]);
+
         if ($requirementId <= 0) {
             $this->success('支付成功');
         }
 
         // 保险起见，同步回调也更新一次
-        Forms::where('id', $requirementId)->update(['pay_status' => 1]);
+        $rows = Forms::where('id', $requirementId)->update(['pay_status' => 1]);
+        Log::info('[payworld.return] updated pay_status', ['requirement_id' => $requirementId, 'rows' => $rows]);
 
         // 跳转到前端“需求详情页”
         $url = $this->request->domain() . '/index.html/#/requirement/' . $requirementId;
+        Log::info('[payworld.return] redirect', ['url' => $url]);
         header('Location: ' . $url);
         exit;
     }
@@ -181,23 +256,39 @@ class Payworld extends Frontend
 
     private function buildSignContent(array $params): string
     {
-        ksort($params);
-        $signstr = '';
+        // 1) 获取所有非空参数；剔除 sign/sign_type；不包含数组、字节流等复杂类型
+        $filtered = [];
         foreach ($params as $k => $v) {
-            if (is_array($v) || $v === null) {
+            if ($k === 'sign' || $k === 'sign_type') {
+                continue;
+            }
+            if (is_array($v) || is_object($v)) {
+                continue;
+            }
+            if ($v === null) {
                 continue;
             }
             $v = trim((string)$v);
-            if ($v === '' || $k === 'sign' || $k === 'sign_type') {
+            if ($v === '') {
                 continue;
             }
-            $signstr .= '&' . $k . '=' . $v;
+            $filtered[$k] = $v;
         }
-        return ltrim($signstr, '&');
+
+        // 2) 按 ASCII 升序排序
+        ksort($filtered);
+
+        // 3) 参数=参数值 以 & 拼接
+        $pairs = [];
+        foreach ($filtered as $k => $v) {
+            $pairs[] = $k . '=' . $v;
+        }
+        return implode('&', $pairs);
     }
 
     private function rsaSign(string $data, string $merchantPrivateKey): string
     {
+        // SHA256WithRSA
         $key = "-----BEGIN PRIVATE KEY-----\n" . wordwrap($merchantPrivateKey, 64, "\n", true) . "\n-----END PRIVATE KEY-----";
         $privateKey = openssl_get_privatekey($key);
         if (!$privateKey) {
