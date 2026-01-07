@@ -18,6 +18,16 @@
                         >
                             {{ $t('Member Center') }}
                         </el-button>
+
+                        <el-button
+                            @click="onPayTest"
+                            class="container-button"
+                            color="#ffffff"
+                            size="large"
+                            :loading="payTesting"
+                        >
+                            1元支付测试
+                        </el-button>
                     </div>
                     <div class="main-right">
                         <img :src="indexCover" alt="" />
@@ -36,9 +46,43 @@ import { useMemberCenter } from '/@/stores/memberCenter'
 import Header from '/@/layouts/frontend/components/header.vue'
 import Footer from '/@/layouts/frontend/components/footer.vue'
 import { memberCenterBaseRoutePath } from '/@/router/static/memberCenterBase'
+import { payTest } from '/@/api/frontend/payworld'
+import { ref } from 'vue'
 
 const siteConfig = useSiteConfig()
 const memberCenter = useMemberCenter()
+
+const payTesting = ref(false)
+
+function submitForm(url: string, params: Record<string, any>) {
+    const form = document.createElement('form')
+    form.method = 'POST'
+    form.action = url
+    form.style.display = 'none'
+
+    Object.keys(params || {}).forEach((key) => {
+        const input = document.createElement('input')
+        input.type = 'hidden'
+        input.name = key
+        input.value = String((params as any)[key] ?? '')
+        form.appendChild(input)
+    })
+
+    document.body.appendChild(form)
+    form.submit()
+    document.body.removeChild(form)
+}
+
+const onPayTest = async () => {
+    payTesting.value = true
+    try {
+        const res = await payTest({ money: 1, type: 'wxpay', name: '支付测试(1元)' })
+        // res.data: { method, url, params }
+        submitForm(res.data.url, res.data.params)
+    } finally {
+        payTesting.value = false
+    }
+}
 </script>
 
 <style scoped lang="scss">
