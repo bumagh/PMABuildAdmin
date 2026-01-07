@@ -1,0 +1,15 @@
+export default {
+    id: '主键ID',
+    contact_info: '联系方式（电话/邮箱等）',
+    requirement_type: '需求类型（可选）',
+    requirement_content: '需求详细内容（必填）',
+    payment_method: '支付方式',
+    payment_amount: '支付金额',
+    create_time: '创建时间（毫秒时间戳）',
+    status: '处理状态',
+    pay_status1: '支付状态',
+    'pay_status1 0': '未支付',
+    'pay_status1 1': '已支付',
+    is_deleted: '软删除标记(0:正常 1:删除)',
+    'quick Search Fields': '主键ID',
+}

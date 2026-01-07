@@ -30,6 +30,24 @@ const staticRoutes: Array<RouteRecordRaw> = [
         },
     },
     {
+        // 需求查询页
+        path: '/requirement',
+        name: 'requirementQuery',
+        component: () => import('/@/views/frontend/requirementQuery.vue'),
+        meta: {
+            title: pageTitle('requirementQuery'),
+        },
+    },
+    {
+        // 需求详情页（支付成功后展示）
+        path: '/requirement/:id',
+        name: 'requirementDetail',
+        component: () => import('/@/views/frontend/requirementDetail.vue'),
+        meta: {
+            title: pageTitle('requirementDetail'),
+        },
+    },
+    {
         // 管理员登录页 - 不放在 adminBaseRoute.children 因为登录页不需要使用后台的布局
         path: adminBaseRoutePath + '/login',
         name: 'adminLogin',

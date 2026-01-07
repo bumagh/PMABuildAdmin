@@ -23,7 +23,7 @@
             </button>
 
             <div style="margin-top: 18px">
-                <button class="insert-coin-btn" style="font-size: 1.1rem; padding: 14px 40px" :disabled="paying" @click="payOneYuan">
+                <button class="insert-coin-btn" style="font-size: 1.1rem; padding: 14px 40px" :disabled="paying" @click="openPayDialog">
                     支付 1 元
                     <span class="sub-text">微信/支付宝均可（默认微信）</span>
                 </button>
@@ -144,9 +144,48 @@
             </div>
 
             <div style="margin-top: 60px">
-                <button class="insert-coin-btn" :disabled="paying" @click="payOneYuan">立即排期 (¥1.00)</button>
+                <button class="insert-coin-btn" :disabled="paying" @click="openPayDialog">立即排期 (¥1.00)</button>
             </div>
         </section>
+
+        <!-- 支付弹窗 -->
+        <div v-if="payDialogVisible" class="dialog-mask" @click.self="closePayDialog">
+            <div class="dialog">
+                <div class="dialog-header">
+                    <div class="dialog-title">提交需求并支付</div>
+                    <button class="dialog-close" @click="closePayDialog">×</button>
+                </div>
+
+                <div class="dialog-body">
+                    <div class="form-item">
+                        <div class="label">联系方式</div>
+                        <input v-model.trim="form.contact" class="input" placeholder="微信号 / 手机号 / 邮箱" />
+                    </div>
+
+                    <div class="form-item">
+                        <div class="label">需求类型</div>
+                        <select v-model="form.type" class="input">
+                            <option value="">请选择（可不选）</option>
+                            <option value="策划文档">策划文档</option>
+                            <option value="美术/视频">美术/视频</option>
+                            <option value="Demo原型">Demo原型</option>
+                            <option value="定制开发">定制开发</option>
+                            <option value="其他">其他</option>
+                        </select>
+                    </div>
+
+                    <div class="form-item">
+                        <div class="label">需求详细</div>
+                        <textarea v-model.trim="form.detail" class="textarea" rows="5" placeholder="请描述你的项目目标、平台、预算、时间等"></textarea>
+                    </div>
+                </div>
+
+                <div class="dialog-footer">
+                    <button class="btn-secondary" :disabled="paying" @click="closePayDialog">取消</button>
+                    <button class="btn-primary" :disabled="paying" @click="submitAndPay">确认提交并支付 1 元</button>
+                </div>
+            </div>
+        </div>
 
         <footer>
             <p>Copyright © 2023 Chuang Le Fang Co-Lab. All Rights Reserved.</p>
@@ -158,27 +197,35 @@
 <script setup>
 import { ref } from 'vue'
 import { payTest } from '/@/api/frontend/payworld'
+import createAxios from '/@/utils/axios'
 
 const paying = ref(false)
 const processRef = ref(null)
 
+const payDialogVisible = ref(false)
+const form = ref({
+    contact: '',
+    type: '',
+    detail: '',
+})
+
 function submitForm(url, params) {
-    const form = document.createElement('form')
-    form.method = 'POST'
-    form.action = url
-    form.style.display = 'none'
+    const formEl = document.createElement('form')
+    formEl.method = 'POST'
+    formEl.action = url
+    formEl.style.display = 'none'
 
     Object.keys(params || {}).forEach((key) => {
         const input = document.createElement('input')
         input.type = 'hidden'
         input.name = key
         input.value = String((params || {})[key] ?? '')
-        form.appendChild(input)
+        formEl.appendChild(input)
     })
 
-    document.body.appendChild(form)
-    form.submit()
-    document.body.removeChild(form)
+    document.body.appendChild(formEl)
+    formEl.submit()
+    document.body.removeChild(formEl)
 }
 
 const scrollToProcess = () => {
@@ -187,11 +234,64 @@ const scrollToProcess = () => {
     el.scrollIntoView({ behavior: 'smooth' })
 }
 
-const payOneYuan = async () => {
+const openPayDialog = () => {
+    payDialogVisible.value = true
+}
+
+const closePayDialog = () => {
+    payDialogVisible.value = false
+}
+
+const submitAndPay = async () => {
+    if (!form.value.contact) {
+        window.alert('请填写联系方式')
+        return
+    }
+    if (!form.value.detail) {
+        window.alert('请填写需求详细')
+        return
+    }
+
     paying.value = true
     try {
-        const res = await payTest({ money: 1, type: 'wxpay', name: '排期费(1元)' })
+        // 1) 先落库需求信息，拿到 requirement_id
+        const requirementRes = await createAxios({
+            url: '/api/requirement/create',
+            method: 'POST',
+            data: {
+                contact: form.value.contact,
+                type: form.value.type,
+                detail: form.value.detail,
+                payment_method: 'wxpay',
+                payment_amount: 1,
+            },
+        })
+
+        const requirementId = requirementRes?.data?.id
+        if (!requirementId) {
+            throw new Error('需求提交失败：未返回 requirement_id')
+        }
+
+        // 2) 发起支付，param 透传 requirement_id 等信息
+        const paramObj = {
+            requirement_id: requirementId,
+            contact: form.value.contact,
+            type: form.value.type,
+            detail: form.value.detail,
+            from: 'product',
+        }
+
+        const res = await payTest({
+            money: 1,
+            type: 'wxpay',
+            name: '排期费(1元)',
+            param: JSON.stringify(paramObj),
+        })
+
+        closePayDialog()
         submitForm(res.data.url, res.data.params)
+    } catch (e) {
+        window.alert(e?.message || '提交失败，请稍后再试')
     } finally {
         paying.value = false
     }
@@ -538,6 +638,125 @@ footer {
     color: #555;
     font-size: 0.8rem;
     border-top: 1px solid #111;
+}
+
+.dialog-mask {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+
+.dialog {
+    width: min(720px, 100%);
+    background: rgba(10, 10, 15, 0.95);
+    border: 1px solid rgba(0, 243, 255, 0.3);
+    box-shadow: 0 0 30px rgba(0, 243, 255, 0.15);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.dialog-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(0, 243, 255, 0.2);
+}
+
+.dialog-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+}
+
+.dialog-close {
+    width: 34px;
+    height: 34px;
+    border: none;
+    background: transparent;
+    color: #fff;
+    font-size: 22px;
+    cursor: pointer;
+    opacity: 0.85;
+}
+
+.dialog-close:hover {
+    opacity: 1;
+}
+
+.dialog-body {
+    padding: 16px;
+}
+
+.form-item {
+    margin-bottom: 14px;
+}
+
+.label {
+    margin-bottom: 8px;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.95rem;
+}
+
+.input,
+.textarea {
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 243, 255, 0.25);
+    background: rgba(0, 0, 0, 0.35);
+    color: #fff;
+    padding: 10px 12px;
+    outline: none;
+}
+
+.input:focus,
+.textarea:focus {
+    border-color: rgba(0, 243, 255, 0.6);
+    box-shadow: 0 0 0 3px rgba(0, 243, 255, 0.12);
+}
+
+.textarea {
+    resize: vertical;
+}
+
+.dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 14px 16px;
+    border-top: 1px solid rgba(0, 243, 255, 0.2);
+}
+
+.btn-primary,
+.btn-secondary {
+    border: none;
+    border-radius: 10px;
+    padding: 10px 14px;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.btn-primary {
+    background: linear-gradient(90deg, var(--neon-cyan), #00a8ff);
+    color: #000;
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.btn-primary:disabled,
+.btn-secondary:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
 }
 
 @media (max-width: 768px) {

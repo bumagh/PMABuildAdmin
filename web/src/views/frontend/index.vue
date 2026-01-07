@@ -20,6 +20,15 @@
                         </el-button>
 
                         <el-button
+                            @click="$router.push('/requirement')"
+                            class="container-button"
+                            color="#ffffff"
+                            size="large"
+                        >
+                            查询需求
+                        </el-button>
+
+                        <el-button
                             v-if="memberCenter.state.open"
                             @click="$router.push(memberCenterBaseRoutePath)"
                             class="container-button"
@@ -29,7 +38,7 @@
                             {{ $t('Member Center') }}
                         </el-button>
 
-                        <el-button
+                        <!-- <el-button
                             @click="onPayTest"
                             class="container-button"
                             color="#ffffff"
@@ -37,7 +46,7 @@
                             :loading="payTesting"
                         >
                             1元支付测试
-                        </el-button>
+                        </el-button> -->
                     </div>
                     <div class="main-right">
                         <img :src="indexCover" alt="" />

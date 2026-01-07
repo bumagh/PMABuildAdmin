@@ -1,0 +1,15 @@
+export default {
+    id: 'id',
+    contact_info: 'contact_info',
+    requirement_type: 'requirement_type',
+    requirement_content: 'requirement_content',
+    payment_method: 'payment_method',
+    payment_amount: 'payment_amount',
+    create_time: 'create_time',
+    status: 'status',
+    pay_status1: 'pay_status1',
+    'pay_status1 0': 'pay_status1 0',
+    'pay_status1 1': 'pay_status1 1',
+    is_deleted: 'is_deleted',
+    'quick Search Fields': 'id',
+}
