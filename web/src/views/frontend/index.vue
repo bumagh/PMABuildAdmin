@@ -7,35 +7,37 @@
                     <div class="main-left">
                         <div class="main-title">{{ siteConfig.siteName }}</div>
                         <div class="main-content">
-                            {{ $t('index.Steve Jobs') }}
+                            {{ $t( 'index.Steve Jobs' ) }}
                         </div>
 
-                        <el-button
-                            @click="$router.push('/product')"
-                            class="container-button"
-                            color="#ffffff"
-                            size="large"
-                        >
-                            产品介绍
+                        <el-button @click="$router.push( '/product' )" class="container-button" color="#ffffff"
+                            size="large">
+                            通用产品介绍
                         </el-button>
-
-                        <el-button
-                            @click="$router.push('/requirement')"
-                            class="container-button"
-                            color="#ffffff"
-                            size="large"
-                        >
+                        <el-button @click="$router.push( '/marbleking' )" class="container-button" color="#ffffff"
+                            size="large">
+                            校园弹珠游戏
+                        </el-button>
+                           <el-button @click="$router.push( '/miniapp' )" class="container-button" color="#ffffff"
+                            size="large">
+                            小游戏小程序孵化
+                        </el-button>
+                             <el-button @click="$router.push( '/petto' )" class="container-button" color="#ffffff"
+                            size="large">
+                            宠物服务到家
+                        </el-button>
+                          <el-button @click="$router.push( '/flashstock' )" class="container-button" color="#ffffff"
+                            size="large">
+                            闪仓副业
+                        </el-button>
+                        <el-button @click="$router.push( '/requirement' )" class="container-button" color="#ffffff"
+                            size="large">
                             查询需求
                         </el-button>
 
-                        <el-button
-                            v-if="memberCenter.state.open"
-                            @click="$router.push(memberCenterBaseRoutePath)"
-                            class="container-button"
-                            color="#ffffff"
-                            size="large"
-                        >
-                            {{ $t('Member Center') }}
+                        <el-button v-if=" memberCenter.state.open " @click="$router.push( memberCenterBaseRoutePath )"
+                            class="container-button" color="#ffffff" size="large">
+                            {{ $t( 'Member Center' ) }}
                         </el-button>
 
                         <!-- <el-button
@@ -49,7 +51,7 @@
                         </el-button> -->
                     </div>
                     <div class="main-right">
-                        <img :src="indexCover" alt="" />
+                        <img :src=" indexCover " alt="" />
                     </div>
                 </div>
             </el-main>
@@ -71,34 +73,39 @@ import { ref } from 'vue'
 const siteConfig = useSiteConfig()
 const memberCenter = useMemberCenter()
 
-const payTesting = ref(false)
+const payTesting = ref( false )
 
-function submitForm(url: string, params: Record<string, any>) {
-    const form = document.createElement('form')
+function submitForm ( url: string, params: Record<string, any> )
+{
+    const form = document.createElement( 'form' )
     form.method = 'POST'
     form.action = url
     form.style.display = 'none'
 
-    Object.keys(params || {}).forEach((key) => {
-        const input = document.createElement('input')
+    Object.keys( params || {} ).forEach( ( key ) =>
+    {
+        const input = document.createElement( 'input' )
         input.type = 'hidden'
         input.name = key
-        input.value = String((params as any)[key] ?? '')
-        form.appendChild(input)
-    })
+        input.value = String( ( params as any )[ key ] ?? '' )
+        form.appendChild( input )
+    } )
 
-    document.body.appendChild(form)
+    document.body.appendChild( form )
     form.submit()
-    document.body.removeChild(form)
+    document.body.removeChild( form )
 }
 
-const onPayTest = async () => {
+const onPayTest = async () =>
+{
     payTesting.value = true
-    try {
-        const res = await payTest({ money: 1, type: 'wxpay', name: '支付测试(1元)' })
+    try
+    {
+        const res = await payTest( { money: 1, type: 'wxpay', name: '支付测试(1元)' } )
         // res.data: { method, url, params }
-        submitForm(res.data.url, res.data.params)
-    } finally {
+        submitForm( res.data.url, res.data.params )
+    } finally
+    {
         payTesting.value = false
     }
 }
@@ -108,14 +115,17 @@ const onPayTest = async () => {
 .container-button {
     margin: 0 15px 15px 0;
 }
+
 .container {
     width: 100vw;
     height: 100vh;
     background: url(/@/assets/bg.jpg) repeat;
     color: var(--el-color-white);
+
     .main {
         height: calc(100vh - 120px);
         padding: 0;
+
         .main-container {
             display: flex;
             height: 100%;
@@ -123,17 +133,21 @@ const onPayTest = async () => {
             margin: 0 auto;
             align-items: center;
             justify-content: space-between;
+
             .main-left {
                 padding-right: 50px;
+
                 .main-title {
                     font-size: 45px;
                 }
+
                 .main-content {
                     padding-top: 20px;
                     padding-bottom: 40px;
                     font-size: var(--el-font-size-large);
                 }
             }
+
             .main-right {
                 img {
                     width: 380px;
@@ -142,25 +156,31 @@ const onPayTest = async () => {
         }
     }
 }
+
 .header {
     background-color: transparent !important;
     box-shadow: none !important;
     position: fixed;
     width: 100%;
+
     :deep(.header-logo) {
         span {
             padding-left: 4px;
             color: var(--el-color-white);
         }
     }
+
     :deep(.frontend-header-menu) {
         background: transparent;
+
         .el-menu-item,
         .el-sub-menu .el-sub-menu__title {
             color: var(--el-color-white);
+
             &.is-active {
                 color: var(--el-color-white) !important;
             }
+
             &:hover {
                 background-color: transparent !important;
                 color: var(--el-menu-hover-text-color);
@@ -168,6 +188,7 @@ const onPayTest = async () => {
         }
     }
 }
+
 .footer {
     color: var(--el-text-color-secondary);
     background-color: transparent !important;
@@ -181,26 +202,31 @@ const onPayTest = async () => {
             height: unset;
         }
     }
+
     .main-container {
         width: 90% !important;
         flex-wrap: wrap;
         align-content: center;
         justify-content: center !important;
+
         .main-right {
             padding-top: 50px;
         }
     }
 }
+
 @media screen and (max-width: 375px) {
     .main-right img {
         width: 300px !important;
     }
 }
+
 @media screen and (max-height: 650px) {
     .main-right img {
         display: none;
     }
 }
+
 @at-root html.dark {
     .container {
         background: url(/@/assets/bg-dark.jpg) repeat;
