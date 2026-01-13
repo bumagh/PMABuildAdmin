@@ -62,6 +62,13 @@ const staticRoutes: Array<RouteRecordRaw> = [
         meta: {
             title: pageTitle('flashstock'),
         },
+    }, {
+        path: '/workai',
+        name: 'workai',
+        component: () => import('/@/views/frontend/app/workai.vue'),
+        meta: {
+            title: pageTitle('workai'),
+        },
     },
     {
         // 需求查询页

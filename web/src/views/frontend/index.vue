@@ -34,7 +34,10 @@
                             size="large">
                             查询需求
                         </el-button>
-
+ <el-button @click="$router.push( '/workai' )" class="container-button" color="#ffffff"
+                            size="large">
+                            沃客AI
+                        </el-button>
                         <el-button v-if=" memberCenter.state.open " @click="$router.push( memberCenterBaseRoutePath )"
                             class="container-button" color="#ffffff" size="large">
                             {{ $t( 'Member Center' ) }}
