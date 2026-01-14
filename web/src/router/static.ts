@@ -54,6 +54,13 @@ const staticRoutes: Array<RouteRecordRaw> = [
         meta: {
             title: pageTitle('miniapp'),
         },
+    },    {
+        path: '/value',
+        name: 'value',
+        component: () => import('/@/views/frontend/app/value.vue'),
+        meta: {
+            title: pageTitle('value'),
+        },
     },
        {
         path: '/flashstock',

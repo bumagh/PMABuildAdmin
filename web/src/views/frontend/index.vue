@@ -18,6 +18,10 @@
                             size="large">
                             校园弹珠游戏
                         </el-button>
+                           <el-button @click="$router.push( '/value' )" class="container-button" color="#ffffff"
+                            size="large">
+                            瓦路Value去中心化平台
+                        </el-button>
                            <el-button @click="$router.push( '/miniapp' )" class="container-button" color="#ffffff"
                             size="large">
                             小游戏小程序孵化
