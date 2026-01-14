@@ -11,6 +11,8 @@
         <nav class="nav">
           <a href="#benefits" class="nav-link">收益优势</a>
           <a href="#process" class="nav-link">加入流程</a>
+          <a href="#station" class="nav-link">站长申请</a>
+          <a href="#agent" class="nav-link">代理合作</a>
           <a href="#faq" class="nav-link">常见问题</a>
         </nav>
         <div class="cta-nav">
@@ -51,9 +53,9 @@
               <span class="btn-icon">🚀</span>
               1元立即开启闪仓
             </button>
-            <button class="btn btn-outline btn-lg" @click="openVideoModal">
-              <span class="btn-icon">▶️</span>
-              观看介绍视频
+            <button class="btn btn-outline btn-lg" @click="scrollToStation">
+              <span class="btn-icon">🏢</span>
+              申请成为区域站长
             </button>
           </div>
           
@@ -76,6 +78,7 @@
         <div class="hero-visual">
           <div class="mockup-container">
             <div class="mockup-phone">
+              <!-- 手机应用模拟界面 -->
               <div class="phone-screen">
                 <div class="app-screen">
                   <div class="app-header">
@@ -340,6 +343,374 @@
       </div>
     </section>
 
+    <!-- 城市区域站长申请 -->
+    <section id="station" class="station">
+      <div class="container">
+        <h2 class="section-title">成为城市区域站长</h2>
+        <p class="section-subtitle">负责区域运营管理，获得高额分成与运营支持</p>
+        
+        <div class="station-content">
+          <div class="station-benefits">
+            <h3 class="station-subtitle">站长权益与收益</h3>
+            <div class="benefits-grid">
+              <div class="station-benefit">
+                <div class="station-benefit-icon">💰</div>
+                <h4>高额收益分成</h4>
+                <p>区域内所有骑手交易流水的5-8%作为管理分成</p>
+                <div class="station-example">
+                  <span>示例：区域月流水10万元，站长分成5000-8000元</span>
+                </div>
+              </div>
+              
+              <div class="station-benefit">
+                <div class="station-benefit-icon">🏢</div>
+                <h4>区域独家运营权</h4>
+                <p>获得指定区域的独家运营权，享受平台全方位支持</p>
+                <div class="station-example">
+                  <span>平台提供系统、培训、供应链、市场物料支持</span>
+                </div>
+              </div>
+              
+              <div class="station-benefit">
+                <div class="station-benefit-icon">📈</div>
+                <h4>长期成长通道</h4>
+                <p>优秀站长可晋升为城市合伙人，参与平台利润分配</p>
+                <div class="station-example">
+                  <span>参与平台决策，享受品牌增值收益</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="station-responsibilities">
+              <h4>站长主要职责：</h4>
+              <ul>
+                <li>负责区域内骑手的招募、培训与管理</li>
+                <li>维护区域供应链与配送网络</li>
+                <li>组织本地营销活动，提升区域订单量</li>
+                <li>处理区域内骑手与客户的日常问题</li>
+                <li>定期向平台汇报区域运营数据</li>
+              </ul>
+            </div>
+          </div>
+          
+          <div class="station-form-container">
+            <div class="station-form-card">
+              <h3 class="station-form-title">站长申请表单</h3>
+              <p class="station-form-subtitle">填写信息，我们的商务经理将在24小时内联系您</p>
+              
+              <form class="station-form" @submit.prevent="handleStationSubmit">
+                <div class="form-group">
+                  <label for="station-name" class="form-label">姓名</label>
+                  <input
+                    type="text"
+                    id="station-name"
+                    v-model="stationForm.name"
+                    placeholder="请输入真实姓名"
+                    required
+                    class="form-input"
+                  />
+                </div>
+                
+                <div class="form-group">
+                  <label for="station-phone" class="form-label">手机号</label>
+                  <input
+                    type="tel"
+                    id="station-phone"
+                    v-model="stationForm.phone"
+                    placeholder="请输入手机号"
+                    required
+                    class="form-input"
+                  />
+                </div>
+                
+                <div class="form-group">
+                  <label for="station-city" class="form-label">申请城市</label>
+                  <select id="station-city" v-model="stationForm.city" class="form-input" required>
+                    <option value="">请选择申请城市</option>
+                    <option value="ganzhou">赣州市</option>
+                    <option value="nanchang">南昌市</option>
+                    <option value="jiujiang">九江市</option>
+                    <option value="other">其他城市</option>
+                  </select>
+                </div>
+                
+                <div class="form-group">
+                  <label for="station-area" class="form-label">意向区域</label>
+                  <input
+                    type="text"
+                    id="station-area"
+                    v-model="stationForm.area"
+                    placeholder="如：章江新区、老城区等"
+                    required
+                    class="form-input"
+                  />
+                </div>
+                
+                <div class="form-group">
+                  <label for="station-experience" class="form-label">相关经验</label>
+                  <select id="station-experience" v-model="stationForm.experience" class="form-input" required>
+                    <option value="">请选择相关经验</option>
+                    <option value="rider">外卖骑手/配送经验</option>
+                    <option value="retail">零售/快消品经验</option>
+                    <option value="management">团队管理经验</option>
+                    <option value="none">无相关经验但学习能力强</option>
+                  </select>
+                </div>
+                
+                <div class="form-group">
+                  <label for="station-investment" class="form-label">可投入资金</label>
+                  <select id="station-investment" v-model="stationForm.investment" class="form-input" required>
+                    <option value="">请选择可投入资金范围</option>
+                    <option value="1-3万">1-3万元</option>
+                    <option value="3-5万">3-5万元</option>
+                    <option value="5-10万">5-10万元</option>
+                    <option value="10万以上">10万元以上</option>
+                  </select>
+                </div>
+                
+                <div class="form-group">
+                  <label for="station-time" class="form-label">每日可投入时间</label>
+                  <select id="station-time" v-model="stationForm.timeCommitment" class="form-input" required>
+                    <option value="">请选择每日可投入时间</option>
+                    <option value="part-time">兼职（2-4小时）</option>
+                    <option value="full-time">全职（8小时以上）</option>
+                  </select>
+                </div>
+                
+                <div class="form-group">
+                  <label for="station-resource" class="form-label">资源优势（选填）</label>
+                  <textarea
+                    id="station-resource"
+                    v-model="stationForm.resources"
+                    placeholder="如：现有团队、仓库资源、商户资源等"
+                    class="form-input"
+                    rows="3"
+                  ></textarea>
+                </div>
+                
+                <div class="form-group terms">
+                  <input
+                    type="checkbox"
+                    id="station-terms"
+                    v-model="stationForm.agreeTerms"
+                    required
+                    class="terms-checkbox"
+                  />
+                  <label for="station-terms" class="terms-label">
+                    我已阅读并同意
+                    <a href="#" @click.prevent="openStationAgreementModal">《区域站长合作协议》</a>
+                  </label>
+                </div>
+                
+                <button 
+                  type="submit" 
+                  class="btn btn-primary btn-block btn-lg"
+                  :disabled="stationSubmitting"
+                >
+                  <span v-if="stationSubmitting" class="spinner"></span>
+                  <span v-else>提交站长申请</span>
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 代理合作板块 -->
+    <section id="agent" class="agent">
+      <div class="container">
+        <h2 class="section-title">成为城市/区域代理</h2>
+        <p class="section-subtitle">开启轻资产创业，共享骑手经济红利</p>
+        
+        <div class="agent-content">
+          <div class="agent-intro">
+            <h3>代理合作模式</h3>
+            <p>骑手闪仓平台提供完整的商业模式、技术系统、供应链支持和运营指导，您负责本地市场的开拓与管理。</p>
+            
+            <div class="agent-models">
+              <div class="agent-model">
+                <h4>城市独家代理</h4>
+                <div class="model-details">
+                  <p><strong>代理费：</strong>5-20万元（根据城市等级）</p>
+                  <p><strong>收益：</strong>城市总流水8-12%分成 + 站长管理收益</p>
+                  <p><strong>权益：</strong>城市独家运营权、品牌授权、全面支持</p>
+                </div>
+                <button class="btn btn-outline" @click="openAgentModal('city')">了解详情</button>
+              </div>
+              
+              <div class="agent-model">
+                <h4>区域合作伙伴</h4>
+                <div class="model-details">
+                  <p><strong>投入：</strong>1-5万元启动资金</p>
+                  <p><strong>收益：</strong>区域内流水10-15%分成</p>
+                  <p><strong>权益：</strong>区域运营权、平台系统支持</p>
+                </div>
+                <button class="btn btn-outline" @click="openAgentModal('region')">了解详情</button>
+              </div>
+              
+              <div class="agent-model">
+                <h4>供应链合作伙伴</h4>
+                <div class="model-details">
+                  <p><strong>合作：</strong>供应商/物流商</p>
+                  <p><strong>收益：</strong>供货差价 + 配送费分成</p>
+                  <p><strong>权益：</strong>平台独家合作、稳定订单来源</p>
+                </div>
+                <button class="btn btn-outline" @click="openAgentModal('supply')">了解详情</button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="agent-form-container">
+            <div class="agent-form-card">
+              <h3 class="agent-form-title">代理合作咨询</h3>
+              <p class="agent-form-subtitle">填写基本信息，获取详细合作方案与收益测算</p>
+              
+              <form class="agent-form" @submit.prevent="handleAgentSubmit">
+                <div class="form-group">
+                  <label for="agent-name" class="form-label">姓名/公司名称</label>
+                  <input
+                    type="text"
+                    id="agent-name"
+                    v-model="agentForm.name"
+                    placeholder="个人请填写姓名，公司请填写公司全称"
+                    required
+                    class="form-input"
+                  />
+                </div>
+                
+                <div class="form-group">
+                  <label for="agent-phone" class="form-label">联系电话</label>
+                  <input
+                    type="tel"
+                    id="agent-phone"
+                    v-model="agentForm.phone"
+                    placeholder="请输入联系电话"
+                    required
+                    class="form-input"
+                  />
+                </div>
+                
+                <div class="form-group">
+                  <label for="agent-email" class="form-label">电子邮箱</label>
+                  <input
+                    type="email"
+                    id="agent-email"
+                    v-model="agentForm.email"
+                    placeholder="请输入电子邮箱"
+                    required
+                    class="form-input"
+                  />
+                </div>
+                
+                <div class="form-group">
+                  <label for="agent-city" class="form-label">意向代理城市</label>
+                  <input
+                    type="text"
+                    id="agent-city"
+                    v-model="agentForm.city"
+                    placeholder="请输入意向代理城市"
+                    required
+                    class="form-input"
+                  />
+                </div>
+                
+                <div class="form-group">
+                  <label for="agent-type" class="form-label">意向合作类型</label>
+                  <select id="agent-type" v-model="agentForm.type" class="form-input" required>
+                    <option value="">请选择合作类型</option>
+                    <option value="city">城市独家代理</option>
+                    <option value="region">区域合作伙伴</option>
+                    <option value="supply">供应链合作</option>
+                    <option value="other">其他合作方式</option>
+                  </select>
+                </div>
+                
+                <div class="form-group">
+                  <label for="agent-budget" class="form-label">预计投资预算</label>
+                  <select id="agent-budget" v-model="agentForm.budget" class="form-input" required>
+                    <option value="">请选择投资预算</option>
+                    <option value="1-5万">1-5万元</option>
+                    <option value="5-10万">5-10万元</option>
+                    <option value="10-20万">10-20万元</option>
+                    <option value="20万以上">20万元以上</option>
+                  </select>
+                </div>
+                
+                <div class="form-group">
+                  <label for="agent-resource" class="form-label">现有资源与优势</label>
+                  <textarea
+                    id="agent-resource"
+                    v-model="agentForm.resources"
+                    placeholder="请描述您的团队、资金、行业经验、本地资源等优势"
+                    class="form-input"
+                    rows="4"
+                    required
+                  ></textarea>
+                </div>
+                
+                <div class="form-group terms">
+                  <input
+                    type="checkbox"
+                    id="agent-terms"
+                    v-model="agentForm.agreeTerms"
+                    required
+                    class="terms-checkbox"
+                  />
+                  <label for="agent-terms" class="terms-label">
+                    我同意接收骑手闪仓的合作资料与最新动态
+                  </label>
+                </div>
+                
+                <button 
+                  type="submit" 
+                  class="btn btn-primary btn-block btn-lg"
+                  :disabled="agentSubmitting"
+                >
+                  <span v-if="agentSubmitting" class="spinner"></span>
+                  <span v-else>提交代理咨询</span>
+                </button>
+                
+                <div class="agent-note">
+                  <p>📞 提交后24小时内，我们的招商总监将与您联系</p>
+                  <p>📊 我们将为您提供详细的合作方案与收益测算表</p>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+        
+        <div class="agent-process">
+          <h3>代理合作流程</h3>
+          <div class="agent-steps">
+            <div class="agent-step">
+              <div class="agent-step-number">1</div>
+              <h4>提交申请</h4>
+              <p>填写代理合作咨询表</p>
+            </div>
+            <div class="agent-step-arrow">➡️</div>
+            <div class="agent-step">
+              <div class="agent-step-number">2</div>
+              <h4>初步沟通</h4>
+              <p>招商总监1对1沟通</p>
+            </div>
+            <div class="agent-step-arrow">➡️</div>
+            <div class="agent-step">
+              <div class="agent-step-number">3</div>
+              <h4>方案定制</h4>
+              <p>获取专属合作方案</p>
+            </div>
+            <div class="agent-step-arrow">➡️</div>
+            <div class="agent-step">
+              <div class="agent-step-number">4</div>
+              <h4>签约启动</h4>
+              <p>签约并启动区域运营</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- 常见问题 -->
     <section id="faq" class="faq">
       <div class="container">
@@ -374,33 +745,45 @@
               <span class="logo-text">骑手闪仓</span>
             </div>
             <p class="footer-desc">赋能骑手，开启移动零售新副业</p>
+            <div class="footer-contact">
+              <p>招商合作: 400-888-5678</p>
+              <p>站长申请: 400-888-1234</p>
+              <p>骑手客服: 400-888-9012</p>
+            </div>
           </div>
           
           <div class="footer-section">
-            <h4 class="footer-title">联系我们</h4>
-            <p>客服微信: qishoushancang</p>
-            <p>客服电话: 400-888-1234</p>
-            <p>服务时间: 9:00-21:00</p>
+            <h4 class="footer-title">快速入口</h4>
+            <a href="#register" class="footer-link">骑手加入</a>
+            <a href="#station" class="footer-link">站长申请</a>
+            <a href="#agent" class="footer-link">代理合作</a>
+            <a href="#faq" class="footer-link">常见问题</a>
           </div>
           
           <div class="footer-section">
             <h4 class="footer-title">办公地址</h4>
             <p>赣州市章贡区红旗大道XX号</p>
             <p>创业大厦3楼301室</p>
+            <p>全国招商中心: 上海市浦东新区XX路XX号</p>
           </div>
           
           <div class="footer-section">
             <h4 class="footer-title">关注我们</h4>
             <div class="social-links">
-              <a href="#" class="social-link">微信</a>
-              <a href="#" class="social-link">抖音</a>
-              <a href="#" class="social-link">QQ群</a>
+              <a href="#" class="social-link">微信公众号</a>
+              <a href="#" class="social-link">抖音官方号</a>
+              <a href="#" class="social-link">招商合作群</a>
+              <a href="#" class="social-link">站长交流群</a>
             </div>
           </div>
         </div>
         
         <div class="footer-bottom">
-          <p>© 2023 骑手闪仓平台. 保留所有权利. | <a href="#">隐私政策</a> | <a href="#">用户协议</a></p>
+          <p>© 2023 骑手闪仓平台. 保留所有权利. | 
+            <a href="#" @click.prevent="openTermsModal">隐私政策</a> | 
+            <a href="#" @click.prevent="openPrivacyModal">用户协议</a> |
+            <a href="#" @click.prevent="openStationAgreementModal">站长协议</a>
+          </p>
         </div>
       </div>
     </footer>
@@ -421,19 +804,34 @@
             </div>
           </div>
           <div v-else-if="modalType === 'terms'">
-            <p>这里是《骑手闪仓服务协议》的具体内容...</p>
-            <!-- 协议具体内容 -->
+            <div class="modal-text-content">
+              <h4>骑手闪仓服务协议</h4>
+              <p>这里是《骑手闪仓服务协议》的具体内容...</p>
+            </div>
           </div>
           <div v-else-if="modalType === 'privacy'">
-            <p>这里是《隐私政策》的具体内容...</p>
-            <!-- 隐私政策具体内容 -->
+            <div class="modal-text-content">
+              <h4>隐私政策</h4>
+              <p>这里是《隐私政策》的具体内容...</p>
+            </div>
+          </div>
+          <div v-else-if="modalType === 'station-agreement'">
+            <div class="modal-text-content">
+              <h4>区域站长合作协议</h4>
+              <p>这里是《区域站长合作协议》的具体内容...</p>
+            </div>
+          </div>
+          <div v-else-if="modalType === 'agent-detail'">
+            <div class="modal-text-content">
+              <h4>{{ agentModalTitle }}</h4>
+              <p>{{ agentModalContent }}</p>
+            </div>
           </div>
           <div v-else-if="modalType === 'success'">
             <div class="success-message">
               <div class="success-icon">🎉</div>
-              <h3>恭喜！您已成功提交申请</h3>
-              <p>我们的运营专员将在24小时内通过电话联系您，请保持手机畅通。</p>
-              <p>同时，我们已发送平台使用指南至您的手机短信，请注意查收。</p>
+              <h3>{{ successTitle }}</h3>
+              <p>{{ successMessage }}</p>
               <button class="btn btn-primary" @click="closeModal">确定</button>
             </div>
           </div>
@@ -446,7 +844,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, computed } from 'vue'
 
-// 表单数据
+// 骑手注册表单数据
 const form = reactive({
   name: '',
   phone: '',
@@ -456,12 +854,43 @@ const form = reactive({
   agreeTerms: false
 })
 
+// 站长申请表单数据
+const stationForm = reactive({
+  name: '',
+  phone: '',
+  city: '',
+  area: '',
+  experience: '',
+  investment: '',
+  timeCommitment: '',
+  resources: '',
+  agreeTerms: false
+})
+
+// 代理合作表单数据
+const agentForm = reactive({
+  name: '',
+  phone: '',
+  email: '',
+  city: '',
+  type: '',
+  budget: '',
+  resources: '',
+  agreeTerms: false
+})
+
 // 状态管理
 const submitting = ref(false)
+const stationSubmitting = ref(false)
+const agentSubmitting = ref(false)
 const activeFaq = ref<number | null>(0)
 const showModal = ref(false)
-const modalType = ref<'video' | 'terms' | 'privacy' | 'success'>('video')
+const modalType = ref<'video' | 'terms' | 'privacy' | 'station-agreement' | 'agent-detail' | 'success'>('video')
 const modalTitle = ref('')
+const successTitle = ref('')
+const successMessage = ref('')
+const agentModalTitle = ref('')
+const agentModalContent = ref('')
 
 // 演示订单数据
 const demoOrders = ref([
@@ -502,6 +931,14 @@ const faqs = ref([
   {
     question: '收益如何结算？多久可以提现？',
     answer: '零售收益实时到账，满10元即可提现，提现申请后24小时内到账。平台不收取任何提现手续费。'
+  },
+  {
+    question: '站长申请有什么要求？',
+    answer: '站长申请需要具备一定的管理能力、本地资源和对骑手群体的了解。有外卖、零售或团队管理经验者优先，平台会提供全面的培训支持。'
+  },
+  {
+    question: '代理合作需要多少资金投入？',
+    answer: '代理合作分为多种模式，城市独家代理需要5-20万元，区域合作伙伴需要1-5万元，具体根据城市等级和区域规模确定。平台提供详细的投资回报分析。'
   }
 ])
 
@@ -516,6 +953,13 @@ const timelineProgress = ref(0)
 // 方法
 const scrollToRegister = () => {
   const element = document.getElementById('register')
+  if (element) {
+    element.scrollIntoView({ behavior: 'smooth' })
+  }
+}
+
+const scrollToStation = () => {
+  const element = document.getElementById('station')
   if (element) {
     element.scrollIntoView({ behavior: 'smooth' })
   }
@@ -539,9 +983,45 @@ const openPrivacyModal = () => {
   showModal.value = true
 }
 
-const openSuccessModal = () => {
+const openStationAgreementModal = () => {
+  modalType.value = 'station-agreement'
+  modalTitle.value = '区域站长合作协议'
+  showModal.value = true
+}
+
+const openAgentModal = (type: 'city' | 'region' | 'supply') => {
+  modalType.value = 'agent-detail'
+  
+  if (type === 'city') {
+    agentModalTitle.value = '城市独家代理详情'
+    agentModalContent.value = '城市独家代理享有指定城市的独家运营权，负责整个城市的骑手闪仓业务拓展与管理。平台提供完整的技术系统、供应链支持、市场物料和运营指导。代理费根据城市等级从5万到20万元不等，享受城市总流水8-12%的分成收益。'
+  } else if (type === 'region') {
+    agentModalTitle.value = '区域合作伙伴详情'
+    agentModalContent.value = '区域合作伙伴负责特定区域（如一个区、几个街道）的运营管理。启动资金1-5万元，享受区域内流水10-15%的分成收益。平台提供系统支持、培训指导和供应链对接，适合本地创业者。'
+  } else {
+    agentModalTitle.value = '供应链合作伙伴详情'
+    agentModalContent.value = '供应链合作伙伴包括商品供应商和物流配送商。供应商可获得稳定的订单来源和平台独家合作权益；物流商可承接平台商品配送业务，获得配送费分成。具体合作方案根据供应能力定制。'
+  }
+  
+  modalTitle.value = agentModalTitle.value
+  showModal.value = true
+}
+
+const openSuccessModal = (type: 'rider' | 'station' | 'agent') => {
   modalType.value = 'success'
-  modalTitle.value = '申请成功'
+  
+  if (type === 'rider') {
+    successTitle.value = '恭喜！您已成功提交申请'
+    successMessage.value = '我们的运营专员将在24小时内通过电话联系您，请保持手机畅通。同时，我们已发送平台使用指南至您的手机短信，请注意查收。'
+  } else if (type === 'station') {
+    successTitle.value = '站长申请已提交'
+    successMessage.value = '我们的区域经理将在24小时内与您联系，详细沟通站长权益、职责与收益模式。请保持手机畅通，我们会为您安排一对一的线上沟通。'
+  } else {
+    successTitle.value = '代理合作咨询已提交'
+    successMessage.value = '我们的招商总监将在24小时内与您联系，为您提供详细的合作方案与收益测算表。请保持手机和邮箱畅通，我们会发送相关资料至您的邮箱。'
+  }
+  
+  modalTitle.value = successTitle.value
   showModal.value = true
 }
 
@@ -564,14 +1044,66 @@ const handleSubmit = async () => {
   // 模拟API请求
   setTimeout(() => {
     submitting.value = false
-    openSuccessModal()
+    openSuccessModal('rider')
     
-    // 重置表单（除了条款同意）
+    // 重置表单
     form.name = ''
     form.phone = ''
     form.platform = ''
     form.area = ''
     form.expectedIncome = '300-500'
+    form.agreeTerms = false
+  }, 1500)
+}
+
+const handleStationSubmit = async () => {
+  if (!stationForm.agreeTerms) {
+    alert('请阅读并同意站长合作协议')
+    return
+  }
+  
+  stationSubmitting.value = true
+  
+  // 模拟API请求
+  setTimeout(() => {
+    stationSubmitting.value = false
+    openSuccessModal('station')
+    
+    // 重置表单
+    stationForm.name = ''
+    stationForm.phone = ''
+    stationForm.city = ''
+    stationForm.area = ''
+    stationForm.experience = ''
+    stationForm.investment = ''
+    stationForm.timeCommitment = ''
+    stationForm.resources = ''
+    stationForm.agreeTerms = false
+  }, 1500)
+}
+
+const handleAgentSubmit = async () => {
+  if (!agentForm.agreeTerms) {
+    alert('请同意接收合作资料')
+    return
+  }
+  
+  agentSubmitting.value = true
+  
+  // 模拟API请求
+  setTimeout(() => {
+    agentSubmitting.value = false
+    openSuccessModal('agent')
+    
+    // 重置表单
+    agentForm.name = ''
+    agentForm.phone = ''
+    agentForm.email = ''
+    agentForm.city = ''
+    agentForm.type = ''
+    agentForm.budget = ''
+    agentForm.resources = ''
+    agentForm.agreeTerms = false
   }, 1500)
 }
 
@@ -591,7 +1123,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* 基础样式 */
+/* 基础样式 - 保持不变 */
 * {
   margin: 0;
   padding: 0;
@@ -673,7 +1205,7 @@ body {
   100% { transform: rotate(360deg); }
 }
 
-/* 头部样式 */
+/* 头部样式 - 保持不变 */
 .header {
   position: fixed;
   top: 0;
@@ -726,7 +1258,7 @@ body {
   gap: 15px;
 }
 
-/* 英雄区域 */
+/* 英雄区域 - 保持不变 */
 .hero {
   padding: 140px 0 80px;
   background: linear-gradient(135deg, #f3f4f6 0%, #f9fafb 100%);
@@ -824,7 +1356,7 @@ body {
   font-size: 18px;
 }
 
-/* 模拟手机界面 */
+/* 模拟手机界面 - 保持不变 */
 .mockup-container {
   position: relative;
 }
@@ -959,7 +1491,7 @@ body {
   font-weight: 700;
 }
 
-/* 收益优势 */
+/* 收益优势 - 保持不变 */
 .benefits {
   padding: 100px 0;
   background: white;
@@ -1017,7 +1549,7 @@ body {
   line-height: 1.6;
 }
 
-/* 加入流程 */
+/* 加入流程 - 保持不变 */
 .process {
   padding: 80px 0;
   background: #f8fafc;
@@ -1112,7 +1644,7 @@ body {
   white-space: nowrap;
 }
 
-/* 注册表单 */
+/* 注册表单 - 保持不变 */
 .register {
   padding: 100px 0;
   background: white;
@@ -1173,6 +1705,28 @@ body {
   outline: none;
   border-color: #4f46e5;
   box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.form-input[type="text"],
+.form-input[type="tel"],
+.form-input[type="email"],
+.form-input[type="number"] {
+  font-family: inherit;
+}
+
+textarea.form-input {
+  resize: vertical;
+  min-height: 80px;
+  font-family: inherit;
+}
+
+select.form-input {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 16px;
+  padding-right: 40px;
 }
 
 .income-range {
@@ -1273,7 +1827,314 @@ body {
   font-size: 20px;
 }
 
-/* 常见问题 */
+/* 城市区域站长申请 */
+.station {
+  padding: 100px 0;
+  background: #f8fafc;
+}
+
+.station-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  margin-top: 40px;
+}
+
+.station-benefits {
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.station-subtitle {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 30px;
+  color: #111827;
+}
+
+.benefits-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 30px;
+  margin-bottom: 40px;
+}
+
+.station-benefit {
+  background: #f9fafb;
+  border-radius: 16px;
+  padding: 24px;
+  border-left: 4px solid #4f46e5;
+}
+
+.station-benefit-icon {
+  font-size: 32px;
+  margin-bottom: 16px;
+}
+
+.station-benefit h4 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: #111827;
+}
+
+.station-benefit p {
+  color: #6b7280;
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+
+.station-example {
+  background: #eff6ff;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #1e40af;
+  margin-top: 12px;
+}
+
+.station-responsibilities {
+  background: #fef3c7;
+  padding: 24px;
+  border-radius: 16px;
+  margin-top: 30px;
+}
+
+.station-responsibilities h4 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: #92400e;
+}
+
+.station-responsibilities ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.station-responsibilities li {
+  padding: 8px 0;
+  color: #78350f;
+  position: relative;
+  padding-left: 24px;
+}
+
+.station-responsibilities li:before {
+  content: "•";
+  color: #d97706;
+  font-size: 20px;
+  position: absolute;
+  left: 0;
+  top: 6px;
+}
+
+.station-form-container {
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.station-form-card {
+  max-width: 100%;
+}
+
+.station-form-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: #111827;
+}
+
+.station-form-subtitle {
+  color: #6b7280;
+  margin-bottom: 30px;
+}
+
+.station-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* 代理合作板块 */
+.agent {
+  padding: 100px 0;
+  background: white;
+}
+
+.agent-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  margin-top: 40px;
+}
+
+.agent-intro {
+  background: #f8fafc;
+  border-radius: 20px;
+  padding: 40px;
+}
+
+.agent-intro h3 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #111827;
+}
+
+.agent-intro p {
+  color: #6b7280;
+  margin-bottom: 30px;
+  line-height: 1.6;
+}
+
+.agent-models {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  margin-top: 30px;
+}
+
+.agent-model {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  border: 2px solid #e5e7eb;
+  transition: all 0.3s;
+}
+
+.agent-model:hover {
+  border-color: #4f46e5;
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(79, 70, 229, 0.1);
+}
+
+.agent-model h4 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: #111827;
+}
+
+.model-details {
+  margin-bottom: 20px;
+}
+
+.model-details p {
+  margin-bottom: 8px;
+  color: #4b5563;
+}
+
+.agent-model .btn {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.agent-form-container {
+  background: #f8fafc;
+  border-radius: 20px;
+  padding: 40px;
+}
+
+.agent-form-card {
+  max-width: 100%;
+}
+
+.agent-form-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: #111827;
+}
+
+.agent-form-subtitle {
+  color: #6b7280;
+  margin-bottom: 30px;
+}
+
+.agent-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.agent-note {
+  background: #dbeafe;
+  padding: 16px;
+  border-radius: 8px;
+  margin-top: 20px;
+  font-size: 14px;
+  color: #1e40af;
+}
+
+.agent-note p {
+  margin-bottom: 8px;
+}
+
+.agent-note p:last-child {
+  margin-bottom: 0;
+}
+
+.agent-process {
+  margin-top: 80px;
+  text-align: center;
+}
+
+.agent-process h3 {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 40px;
+  color: #111827;
+}
+
+.agent-steps {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.agent-step {
+  text-align: center;
+  max-width: 180px;
+}
+
+.agent-step-number {
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 auto 16px;
+}
+
+.agent-step h4 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #111827;
+}
+
+.agent-step p {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.agent-step-arrow {
+  font-size: 20px;
+  color: #9ca3af;
+}
+
+/* 常见问题 - 保持不变 */
 .faq {
   padding: 80px 0;
   background: #f8fafc;
@@ -1345,6 +2206,17 @@ body {
 .footer-desc {
   color: #9ca3af;
   font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.footer-contact {
+  margin-top: 10px;
+}
+
+.footer-contact p {
+  color: #d1d5db;
+  margin-bottom: 6px;
+  font-size: 14px;
 }
 
 .footer-title {
@@ -1359,9 +2231,23 @@ body {
   font-size: 14px;
 }
 
+.footer-link {
+  display: block;
+  color: #d1d5db;
+  text-decoration: none;
+  margin-bottom: 12px;
+  font-size: 14px;
+  transition: color 0.3s;
+}
+
+.footer-link:hover {
+  color: white;
+}
+
 .social-links {
   display: flex;
-  gap: 15px;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .social-link {
@@ -1446,6 +2332,24 @@ body {
   padding: 24px;
 }
 
+.modal-text-content {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.modal-text-content h4 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: #111827;
+}
+
+.modal-text-content p {
+  color: #6b7280;
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
 .video-placeholder {
   background: #1f2937;
   border-radius: 12px;
@@ -1482,6 +2386,7 @@ body {
 .success-message p {
   color: #6b7280;
   margin-bottom: 12px;
+  line-height: 1.6;
 }
 
 /* 响应式设计 */
@@ -1498,6 +2403,16 @@ body {
   .mockup-phone {
     width: 280px;
     height: 560px;
+  }
+  
+  .station-content,
+  .agent-content {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  
+  .agent-steps {
+    gap: 20px;
   }
 }
 
@@ -1519,6 +2434,15 @@ body {
     transform: rotate(90deg);
   }
   
+  .agent-steps {
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .agent-step-arrow {
+    transform: rotate(90deg);
+  }
+  
   .income-range {
     grid-template-columns: 1fr;
   }
@@ -1531,13 +2455,24 @@ body {
     flex-direction: column;
     gap: 20px;
   }
-}
-
-@media (max-width: 480px) {
+  
   .hero-actions {
     flex-direction: column;
   }
   
+  .benefits-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .station-benefits,
+  .station-form-container,
+  .agent-intro,
+  .agent-form-container {
+    padding: 24px;
+  }
+}
+
+@media (max-width: 480px) {
   .btn-lg {
     width: 100%;
   }
@@ -1549,6 +2484,16 @@ body {
   .assurance-list {
     flex-direction: column;
     gap: 20px;
+  }
+  
+  .station-subtitle,
+  .station-form-title,
+  .agent-form-title {
+    font-size: 20px;
+  }
+  
+  .agent-model h4 {
+    font-size: 18px;
   }
 }
 </style>
