@@ -10,42 +10,35 @@
                             {{ $t( 'index.Steve Jobs' ) }}
                         </div>
 
-                        <el-button @click="$router.push( '/product' )" class="container-button" color="#ffffff"
-                            size="large">
-                            通用产品介绍
-                        </el-button>
-                        <el-button @click="$router.push( '/marbleking' )" class="container-button" color="#ffffff"
-                            size="large">
-                            校园弹珠游戏
-                        </el-button>
-                           <el-button @click="$router.push( '/value' )" class="container-button" color="#ffffff"
-                            size="large">
-                            瓦路Value去中心化平台
-                        </el-button>
-                           <el-button @click="$router.push( '/miniapp' )" class="container-button" color="#ffffff"
-                            size="large">
-                            小游戏小程序孵化
-                        </el-button>
-                             <el-button @click="$router.push( '/petto' )" class="container-button" color="#ffffff"
-                            size="large">
-                            宠物服务到家
-                        </el-button>
-                          <el-button @click="$router.push( '/flashstock' )" class="container-button" color="#ffffff"
-                            size="large">
-                            闪仓副业
-                        </el-button>
-                        <el-button @click="$router.push( '/requirement' )" class="container-button" color="#ffffff"
-                            size="large">
-                            查询需求
-                        </el-button>
- <el-button @click="$router.push( '/workai' )" class="container-button" color="#ffffff"
-                            size="large">
-                            沃客AI
-                        </el-button>
-                        <el-button v-if=" memberCenter.state.open " @click="$router.push( memberCenterBaseRoutePath )"
-                            class="container-button" color="#ffffff" size="large">
-                            {{ $t( 'Member Center' ) }}
-                        </el-button>
+                        <div class="card-container">
+                            <div @click="$router.push( '/product' )" class="service-card">
+                                <div class="card-title">通用产品介绍</div>
+                            </div>
+                            <div @click="$router.push( '/marbleking' )" class="service-card">
+                                <div class="card-title">校园弹珠游戏</div>
+                            </div>
+                            <div @click="$router.push( '/value' )" class="service-card">
+                                <div class="card-title">瓦路Value去中心化平台</div>
+                            </div>
+                            <div @click="$router.push( '/miniapp' )" class="service-card">
+                                <div class="card-title">小游戏小程序孵化</div>
+                            </div>
+                            <div @click="$router.push( '/petto' )" class="service-card">
+                                <div class="card-title">宠物服务到家</div>
+                            </div>
+                            <div @click="$router.push( '/flashstock' )" class="service-card">
+                                <div class="card-title">闪仓副业</div>
+                            </div>
+                            <div @click="$router.push( '/requirement' )" class="service-card">
+                                <div class="card-title">查询需求</div>
+                            </div>
+                            <div @click="$router.push( '/workai' )" class="service-card">
+                                <div class="card-title">沃客AI</div>
+                            </div>
+                            <div v-if=" memberCenter.state.open " @click="$router.push( memberCenterBaseRoutePath )" class="service-card">
+                                <div class="card-title">{{ $t( 'Member Center' ) }}</div>
+                            </div>
+                        </div>
 
                         <!-- <el-button
                             @click="onPayTest"
@@ -119,8 +112,38 @@ const onPayTest = async () =>
 </script>
 
 <style scoped lang="scss">
-.container-button {
-    margin: 0 15px 15px 0;
+.card-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.service-card {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 20px 15px;
+    min-width: 160px;
+    flex: 1 1 calc(33.333% - 10px);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    
+    &:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.4);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .card-title {
+        color: var(--el-color-white);
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 1.4;
+    }
 }
 
 .container {
@@ -219,6 +242,18 @@ const onPayTest = async () =>
         .main-right {
             padding-top: 50px;
         }
+    }
+    
+    .service-card {
+        flex: 1 1 calc(50% - 10px);
+        min-width: 140px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .service-card {
+        flex: 1 1 100%;
+        min-width: unset;
     }
 }
 

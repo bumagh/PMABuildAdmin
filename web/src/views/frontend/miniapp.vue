@@ -121,7 +121,7 @@
         <p class="section-subtitle">
           您的收入将主要来源于微信平台庞大的广告生态，透明可分润。
         </p>
-        
+
         <div class="revenue-cards">
           <div class="revenue-card">
             <div class="card-header">
@@ -151,7 +151,7 @@
                 </div>
               </div>
             </div>
-            
+
             <div class="revenue-simulation">
               <h4>收益模拟（以保守数据估算）</h4>
               <div class="simulation-formula">
@@ -175,7 +175,7 @@
               </div>
             </div>
           </div>
-          
+
           <div class="revenue-card">
             <div class="card-header">
               <h3>2. 订阅会员模式（增值选项）</h3>
@@ -210,7 +210,7 @@
             </div>
           </div>
         </div>
-        
+
         <div class="disclaimer">
           * 所有收入数据均为基于行业模型的估算，实际收益取决于运营情况与市场环境，不作为收入保证。
         </div>
@@ -270,7 +270,7 @@
           <p class="cta-text">
             我们不只是开发商，更是您的数字资产合伙人。我们的目标是：用最高效的方式，为您在微信生态内搭建一台自动化、可持续的"睡后收入"生成器。
           </p>
-          
+
           <div class="cta-benefits">
             <h3>扫码添加顾问，支付1元预定金，解锁以下权益：</h3>
             <div class="benefits-grid">
@@ -288,18 +288,18 @@
               </div>
             </div>
           </div>
-          
+
           <div class="cta-footnote">
             <p>
               <strong>注：</strong>1元为诚意排期预定费用，用于锁定项目席位与深度咨询服务，后续开发费用将在双方确认方案后另行商议。
             </p>
           </div>
-          
+
           <button class="final-cta-button" @click="handleConsult">
             <span class="button-main">支付1元锁定名额</span>
             <span class="button-sub">仅剩{{ remainingSlots }}个名额</span>
           </button>
-          
+
           <div class="urgency-message">
             <span class="urgency-icon">⏰</span>
             <span>本次优惠仅限前50名，已有{{ 50 - remainingSlots }}人加入</span>
@@ -315,37 +315,15 @@
         <h3 class="modal-title">1元锁定专属咨询名额</h3>
         <div class="modal-body">
           <p>请留下您的联系方式，顾问将在15分钟内与您联系</p>
+
           <div class="form-group">
-            <input 
-              type="text" 
-              v-model="formData.name"
-              placeholder="您的姓名"
-              class="form-input"
-            />
+            <input type="tel" v-model="formData.phone" placeholder="手机号码" class="form-input" />
           </div>
           <div class="form-group">
-            <input 
-              type="tel" 
-              v-model="formData.phone"
-              placeholder="手机号码"
-              class="form-input"
-            />
+            <input type="email" v-model="formData.email" placeholder="电子邮箱（选填）" class="form-input" />
           </div>
           <div class="form-group">
-            <input 
-              type="email" 
-              v-model="formData.email"
-              placeholder="电子邮箱（选填）"
-              class="form-input"
-            />
-          </div>
-          <div class="form-group">
-            <textarea 
-              v-model="formData.message"
-              placeholder="您的需求或疑问（选填）"
-              class="form-textarea"
-              rows="3"
-            ></textarea>
+            <textarea v-model="formData.message" placeholder="您的需求或疑问（选填）" class="form-textarea" rows="3"></textarea>
           </div>
           <button class="modal-submit" @click="submitConsult">
             确认提交，支付1元
@@ -361,6 +339,8 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
+import createAxios from '/@/utils/axios'
+import { payTest } from '/@/api/frontend/payworld'
 
 interface DeliveryStep {
   week: string
@@ -472,39 +452,78 @@ const closeModal = () => {
 }
 
 const submitConsult = async () => {
-  if (!formData.name || !formData.phone) {
-    alert('请填写姓名和手机号码')
+  if (!formData.phone) {
+    alert('请填写手机号码')
     return
   }
-  
+
   // 这里可以添加API调用
   try {
-    // const response = await fetch('/api/consult', {
-    //   method: 'POST',
-    //   body: JSON.stringify(formData)
-    // })
-    
+    // 1) 先落库需求信息，拿到 requirement_id
+    const requirementRes = await createAxios({
+      url: '/api/requirement/create',
+      method: 'POST',
+      data: {
+        contact: formData.phone,
+        type: '',
+        detail: formData.message==''?'小程序小游戏孵化':formData.message,
+        payment_method: 'wxpay',
+        payment_amount: 1,
+      },
+    })
+
+    const requirementId = requirementRes?.data?.id
+    if (!requirementId) {
+      throw new Error('需求提交失败：未返回 requirement_id')
+    }
+
+    // 2) 发起支付：param 只透传 requirement_id（纯值）
+    const res = await payTest({
+      money: 1,
+      type: 'wxpay',
+      name: '排期费(1元)',
+      param: String(requirementId),
+    })
     // 模拟API调用
     console.log('提交咨询:', formData)
-    
+
     // 模拟支付跳转
-    alert('即将跳转支付页面...')
+    // alert('即将跳转支付页面...')
     // window.location.href = '/payment?amount=1'
-    
+
     // 清空表单
     Object.keys(formData).forEach(key => {
       formData[key as keyof typeof formData] = ''
     })
-    
+    submitForm(res.data.url, res.data.params);
     closeModal()
     remainingSlots.value -= 1
-    
+
   } catch (error) {
     console.error('提交失败:', error)
     alert('提交失败，请稍后重试')
+  } finally {
+    closeModal()
   }
 }
+function submitForm(url: string, params: Record<string, any>): void {
+    const formEl = document.createElement('form')
+    formEl.method = 'POST'
+    formEl.action = url
+    formEl.style.display = 'none'
 
+    Object.keys(params || {}).forEach((key) => {
+        const input = document.createElement('input')
+        input.type = 'hidden'
+        input.name = key
+        input.value = String((params || {})[key] ?? '')
+        formEl.appendChild(input)
+    })
+
+    document.body.appendChild(formEl)
+    formEl.submit()
+    document.body.removeChild(formEl)
+}
 // 生命周期钩子
 onMounted(() => {
   // 可以添加一些初始化逻辑
@@ -547,7 +566,7 @@ onMounted(() => {
 .hero-title em {
   font-style: normal;
   color: #ffd700;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .hero-subtitle {
@@ -572,7 +591,7 @@ onMounted(() => {
   display: inline-flex;
   align-items: center;
   gap: 15px;
-  background: rgba(255,255,255,0.1);
+  background: rgba(255, 255, 255, 0.1);
   padding: 15px 30px;
   border-radius: 50px;
   margin-bottom: 30px;
@@ -608,7 +627,7 @@ onMounted(() => {
 .cta-button:hover {
   background: #ff5252;
   transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(255,107,107,0.3);
+  box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
 }
 
 .button-sub {
@@ -658,7 +677,8 @@ onMounted(() => {
   gap: 40px;
 }
 
-.bad-side, .good-side {
+.bad-side,
+.good-side {
   padding: 30px;
   border-radius: 15px;
 }
@@ -685,7 +705,7 @@ onMounted(() => {
   padding: 15px;
   background: white;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .point-list .icon {
@@ -785,7 +805,7 @@ onMounted(() => {
   background: white;
   padding: 30px;
   border-radius: 12px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
   flex: 1;
   margin-left: 20px;
 }
@@ -829,7 +849,7 @@ onMounted(() => {
 .revenue-card {
   padding: 30px;
   border-radius: 15px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
 .revenue-card:first-child {
@@ -983,7 +1003,7 @@ onMounted(() => {
   padding: 40px 20px;
   background: white;
   border-radius: 15px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
 }
 
 .guarantee-icon {
@@ -1048,7 +1068,7 @@ onMounted(() => {
 .cta-card {
   max-width: 800px;
   margin: 0 auto;
-  background: rgba(255,255,255,0.05);
+  background: rgba(255, 255, 255, 0.05);
   padding: 60px;
   border-radius: 20px;
   backdrop-filter: blur(10px);
@@ -1071,7 +1091,7 @@ onMounted(() => {
 
 .cta-benefits {
   text-align: left;
-  background: rgba(255,255,255,0.1);
+  background: rgba(255, 255, 255, 0.1);
   padding: 30px;
   border-radius: 15px;
   margin-bottom: 30px;
@@ -1106,7 +1126,7 @@ onMounted(() => {
 .cta-footnote {
   margin: 30px 0;
   padding: 20px;
-  background: rgba(255,255,255,0.1);
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 10px;
   text-align: left;
 }
@@ -1151,7 +1171,7 @@ onMounted(() => {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0,0,0,0.8);
+  background: rgba(0, 0, 0, 0.8);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1191,7 +1211,8 @@ onMounted(() => {
   margin-bottom: 20px;
 }
 
-.form-input, .form-textarea {
+.form-input,
+.form-textarea {
   width: 100%;
   padding: 15px;
   border: 2px solid #e2e8f0;
@@ -1200,7 +1221,8 @@ onMounted(() => {
   transition: border-color 0.3s ease;
 }
 
-.form-input:focus, .form-textarea:focus {
+.form-input:focus,
+.form-textarea:focus {
   outline: none;
   border-color: #667eea;
 }
@@ -1237,8 +1259,15 @@ onMounted(() => {
 
 /* Animations */
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
 }
 
 @keyframes slideIn {
@@ -1246,6 +1275,7 @@ onMounted(() => {
     opacity: 0;
     transform: translateY(-50px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -1257,7 +1287,7 @@ onMounted(() => {
   .hero-title {
     font-size: 2.8rem;
   }
-  
+
   .revenue-cards,
   .guarantee-grid,
   .audience-grid,
@@ -1270,31 +1300,31 @@ onMounted(() => {
   .comparison-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .section {
     padding: 50px 0;
   }
-  
+
   .hero-section {
     padding: 60px 0;
   }
-  
+
   .hero-title {
     font-size: 2.2rem;
   }
-  
+
   .section-title {
     font-size: 1.8rem;
   }
-  
+
   .timeline::before {
     left: 20px;
   }
-  
+
   .timeline-marker {
     width: 40px;
   }
-  
+
   .subscription-benefits {
     grid-template-columns: 1fr;
   }
@@ -1304,16 +1334,16 @@ onMounted(() => {
   .container {
     padding: 0 15px;
   }
-  
+
   .hero-title {
     font-size: 1.8rem;
   }
-  
+
   .pricing-tag {
     flex-direction: column;
     gap: 10px;
   }
-  
+
   .modal-content {
     padding: 30px 20px;
   }
