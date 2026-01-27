@@ -2,7 +2,7 @@
 # 修复编码问题和路径问题
 
 param(
-    [string]$RemoteDir = "/www/wwwroot/app.tutlab.tech/app/",
+    [string]$RemoteDir = "/www/wwwroot/work.tutlab.tech/app/",
     [string]$Server = "root@tutlab.tech",
     [string]$LocalDirPub = "./app/"
 
