@@ -26,7 +26,7 @@
     </nav>
 
     <!-- 主内容区 -->
-    <main class="dashboard-main">
+    <main class="dashboard-main" :class="{ 'mobile-tab-active': isMobile && activeTab !== 'overview' }" :data-active-tab="activeTab">
       <!-- 顶部概览 -->
       <div class="overview-section">
         <div class="welcome-card">
@@ -239,6 +239,20 @@
         />
       </div>
     </div>
+
+    <!-- 移动端底部导航栏 -->
+    <nav class="mobile-tab-bar" v-if="isMobile">
+      <div 
+        v-for="tab in mobileTabs" 
+        :key="tab.id"
+        class="tab-item"
+        :class="{ 'active': activeTab === tab.id }"
+        @click="switchTab(tab.id)"
+      >
+        <span class="tab-icon">{{ tab.icon }}</span>
+        <span class="tab-label">{{ tab.label }}</span>
+      </div>
+    </nav>
   </div>
 </template>
 
@@ -637,6 +651,19 @@ const categoryLabels: Record<string, string> = {
 const activeDetail = ref<string | null>(null)
 const showSettingsPanel = ref(false)
 
+// 移动端状态
+const activeTab = ref('overview')
+const isMobile = ref(false)
+
+// 移动端标签配置
+const mobileTabs = [
+  { id: 'overview', label: '概览', icon: '🏠' },
+  { id: 'metrics', label: '指标', icon: '📊' },
+  { id: 'ranking', label: '排名', icon: '🏆' },
+  { id: 'evolution', label: '进化', icon: '🧬' },
+  { id: 'influence', label: '影响', icon: '🌍' }
+]
+
 // 方法
 const formatDate = (dateString: string): string => {
   const date = new Date(dateString)
@@ -732,9 +759,23 @@ const dismissNotification = (index: number) => {
   notifications.value.splice(index, 1)
 }
 
+// 移动端方法
+const switchTab = (tabId: string) => {
+  activeTab.value = tabId
+}
+
+const checkMobile = () => {
+  isMobile.value = window.innerWidth <= 768
+}
+
 // 生命周期
 onMounted(() => {
   console.log('超人类主义面板已加载')
+  checkMobile()
+  window.addEventListener('resize', checkMobile)
+  window.addEventListener('beforeunload', () => {
+    console.log('超人类主义面板即将卸载')
+  })
 })
 </script>
 
@@ -1357,6 +1398,7 @@ h1 {
 @media (max-width: 768px) {
   .dashboard-main {
     padding: 1rem;
+    padding-bottom: 5rem; /* 为底部导航栏留空间 */
   }
   
   .metrics-grid {
@@ -1365,6 +1407,90 @@ h1 {
   
   .influence-grid {
     grid-template-columns: 1fr;
+  }
+
+  /* 移动端底部导航栏样式 */
+  .mobile-tab-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(26, 26, 46, 0.95);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-around;
+    padding: 0.5rem 0;
+    z-index: 1000;
+  }
+
+  .tab-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    min-width: 60px;
+  }
+
+  .tab-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .tab-item.active {
+    background: rgba(0, 212, 255, 0.1);
+  }
+
+  .tab-item.active .tab-icon {
+    transform: scale(1.1);
+  }
+
+  .tab-item.active .tab-label {
+    color: #00d4ff;
+  }
+
+  .tab-icon {
+    font-size: 1.25rem;
+    transition: transform 0.3s ease;
+  }
+
+  .tab-label {
+    font-size: 0.75rem;
+    color: #a0a0a0;
+    transition: color 0.3s ease;
+  }
+
+  /* 移动端内容区域切换 */
+  .dashboard-main.mobile-tab-active .overview-section,
+  .dashboard-main.mobile-tab-active .metrics-section,
+  .dashboard-main.mobile-tab-active .ranking-section,
+  .dashboard-main.mobile-tab-active .evolution-section,
+  .dashboard-main.mobile-tab-active .influence-section {
+    display: none;
+  }
+
+  /* 根据活动标签显示对应内容 */
+  .dashboard-main.mobile-tab-active .overview-section {
+    display: block;
+  }
+
+  .dashboard-main.mobile-tab-active[data-active-tab="metrics"] .metrics-section {
+    display: block;
+  }
+
+  .dashboard-main.mobile-tab-active[data-active-tab="ranking"] .ranking-section {
+    display: block;
+  }
+
+  .dashboard-main.mobile-tab-active[data-active-tab="evolution"] .evolution-section {
+    display: block;
+  }
+
+  .dashboard-main.mobile-tab-active[data-active-tab="influence"] .influence-section {
+    display: block;
   }
 }
 
