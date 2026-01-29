@@ -37,8 +37,15 @@ const staticRoutes: Array<RouteRecordRaw> = [
         meta: {
             title: pageTitle('marbleking'),
         },
+    }, {
+        path: '/quantumboard',
+        name: 'quantumboard',
+        component: () => import('/@/views/frontend/app/quantumboard.vue'),
+        meta: {
+            title: pageTitle('quantumboard'),
+        },
     },
-      {
+    {
         path: '/petto',
         name: 'petto',
         component: () => import('/@/views/frontend/app/petto.vue'),
@@ -46,7 +53,7 @@ const staticRoutes: Array<RouteRecordRaw> = [
             title: pageTitle('petto'),
         },
     },
-     //增加petto.html页
+    //增加petto.html页
     {
         path: '/miniapp',
         name: 'miniapp',
@@ -54,7 +61,7 @@ const staticRoutes: Array<RouteRecordRaw> = [
         meta: {
             title: pageTitle('miniapp'),
         },
-    },    {
+    }, {
         path: '/value',
         name: 'value',
         component: () => import('/@/views/frontend/app/value.vue'),
@@ -62,7 +69,7 @@ const staticRoutes: Array<RouteRecordRaw> = [
             title: pageTitle('value'),
         },
     },
-       {
+    {
         path: '/flashstock',
         name: 'flashstock',
         component: () => import('/@/views/frontend/app/flashstock.vue'),
