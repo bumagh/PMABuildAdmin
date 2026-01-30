@@ -38,6 +38,9 @@
                             <div @click="$router.push( '/quantumboard' )" class="service-card">
                                 <div class="card-title">量子板</div>
                             </div>
+                            <div @click="$router.push( '/dreamxai' )" class="service-card">
+                                <div class="card-title">创梦AI</div>
+                            </div>
                             <div v-if=" memberCenter.state.open " @click="$router.push( memberCenterBaseRoutePath )" class="service-card">
                                 <div class="card-title">{{ $t( 'Member Center' ) }}</div>
                             </div>

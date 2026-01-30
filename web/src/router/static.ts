@@ -46,6 +46,14 @@ const staticRoutes: Array<RouteRecordRaw> = [
         },
     },
     {
+        path: '/dreamxai',
+        name: 'dreamxai',
+        component: () => import('/@/views/frontend/app/dreamxai.vue'),
+        meta: {
+            title: pageTitle('dreamxai'),
+        },
+    },
+    {
         path: '/petto',
         name: 'petto',
         component: () => import('/@/views/frontend/app/petto.vue'),
