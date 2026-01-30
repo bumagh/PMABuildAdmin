@@ -29,6 +29,15 @@ const staticRoutes: Array<RouteRecordRaw> = [
             title: pageTitle('product'),
         },
     },
+     {
+        // 产品页
+        path: '/decisionai',
+        name: 'decisionai',
+        component: () => import('/@/views/frontend/app/decisionai.vue'),
+        meta: {
+            title: pageTitle('decisionai'),
+        },
+    },
     //增加marbleking.html页
     {
         path: '/marbleking',
