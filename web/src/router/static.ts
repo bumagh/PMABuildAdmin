@@ -29,6 +29,15 @@ const staticRoutes: Array<RouteRecordRaw> = [
             title: pageTitle('product'),
         },
     },
+    //增加comsimu.html页
+    {
+         path: '/flashstocksimu',
+        name: 'flashstocksimu',
+        component: () => import('/@/views/frontend/comsimu/flashstocksimu.vue'),
+        meta: {
+            title: '模拟闪仓',
+        },
+    },
      {
         // 产品页
         path: '/decisionai',

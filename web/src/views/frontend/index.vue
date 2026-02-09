@@ -44,6 +44,9 @@
                             <div @click="$router.push( '/decisionai' )" class="service-card">
                                 <div class="card-title">决策AI</div>
                             </div>
+                            <div @click="$router.push( '/flashstocksimu' )" class="service-card">
+                                <div class="card-title">模拟闪仓</div>
+                            </div>
                             <div v-if=" memberCenter.state.open " @click="$router.push( memberCenterBaseRoutePath )" class="service-card">
                                 <div class="card-title">{{ $t( 'Member Center' ) }}</div>
                             </div>
